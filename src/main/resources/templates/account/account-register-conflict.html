@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>모의투자::계정신청</title>
+<link
+	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+	rel="stylesheet" />
+<link th:href="@{/static/css/style.css}" rel="stylesheet" />
+</head>
+<body>
+	<div class="container">
+		<div th:replace="~{index::banner}"></div>
+		<div style="width: 448px;" class="m-auto">
+			<div class="border rounded-2 p-4 mb-2">
+				<h5>이메일 주소가 이미 사용중입니다.</h5>
+				<div>
+					신규 계정을 신청하셨지만,<br/>
+					이미 <b th:text="${username}">username</b> 를 사용하는 계정이
+					존재합니다.
+				</div>
+			</div>
+			<div class="px-4 py-3">
+				<h5>계정을 가지고 계십니까?</h5>
+				<div>
+					<a th:href="@{/signin}">로그인</a>
+				</div>
+				<div>
+					<a th:href="@{/signin}">비밀번호 재발급</a>
+				</div>
+			</div>
+			<div class="px-4 py-3">
+				<h5>처음이십니까?</h5>
+				<div>
+					<a th:href="@{/register}">새로운 이메일주소로 계정신청</a>
+				</div>
+			</div>
+		</div>
+		
+	</div>
+
+	<script
+		src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

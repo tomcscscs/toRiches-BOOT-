@@ -17,8 +17,8 @@ import lombok.Setter;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity
 @Table(name = "accounts")
+@Entity
 public class Account {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,7 +32,6 @@ public class Account {
 
 	private Long balance;
 
-	
 	@PrePersist
 	public void prePersist() {
 		this.status = false;

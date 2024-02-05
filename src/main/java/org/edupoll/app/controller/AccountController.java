@@ -1,6 +1,7 @@
 package org.edupoll.app.controller;
 
 import org.edupoll.app.command.NewAccount;
+import org.edupoll.app.entity.Account;
 import org.edupoll.app.service.AccountService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -8,6 +9,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -16,32 +18,54 @@ import lombok.RequiredArgsConstructor;
 @Controller
 public class AccountController {
 
-	private final AccountService accountService; // 여기에다 리포지토리가 아니라 컨틀로러에서 서비스로 연결되는 형태를 띈다.
+	private final AccountService accountService;
 
+	
+	@GetMapping("/signin")
+	public String showAccountSignin(@RequestParam(required=false) String username, Model model) {
+		if(username == null) {
+			return "account/account-input-username";
+		}else {
+			model.addAttribute("username", username);
+			return "account/account-input-password";
+		}
+	}
+	
+	
+	
+	
+	
 	@GetMapping("/register")
-	public String showAccountRegister() {
-		return "/account/account-register-form";
+	public String showAccountRegister(Model model) {
+		Account dummy = Account.builder().build();
+		model.addAttribute("newAccount", dummy);
+
+		return "account/account-register-form";
 	}
 
 	@PostMapping("/register")
 	public String proceedAccountRegister(@ModelAttribute @Valid NewAccount cmd, BindingResult result, Model model) {
 		if (result.hasErrors()) {
-
-			String emailAddress = cmd.getUsername();
-			model.addAttribute("emailAddress", emailAddress);
-			String nickname = cmd.getNickname();
-
-			model.addAttribute("nickname", nickname);
-
-			return "account/conflict-errorpage";
-
+//			System.out.println(result.getFieldError("username"));
+//			System.out.println(result.getFieldError("password"));
+//			System.out.println(result.getFieldError("nickname"));
+//			model.addAttribute("newAccount", cmd);
+			return "account/account-register-form";
 		}
+
 		boolean isCreated = accountService.createNewAccount(cmd);
 		if (!isCreated) {
-
+			return "redirect:/register/conflict?username=" + cmd.getUsername();
 		}
 
 		return "redirect:/";
+	}
 
+	@GetMapping("/register/conflict")
+	public String proceedAccountRegister(@RequestParam String username, Model model) {
+
+		model.addAttribute("username", username);
+
+		return "account/account-register-conflict";
 	}
 }

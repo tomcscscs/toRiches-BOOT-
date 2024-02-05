@@ -21,9 +21,8 @@ public class AccountService {
 
 		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 		Account entity = Account.builder().username(newAccount.getUsername())//
-				.password(encoder.encode(newAccount.getPassword()))//
+				.password("{bcrypt}"+encoder.encode(newAccount.getPassword()))//
 				.nickname(newAccount.getNickname()).build();
-		
 		accountRepository.save(entity);
 
 		return true;

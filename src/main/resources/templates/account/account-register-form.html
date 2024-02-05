@@ -8,37 +8,44 @@
 	rel="stylesheet" />
 <link th:href="@{/static/css/style.css}" rel="stylesheet" />
 </head>
-<body style="background-color: aqua;">
+<body>
 	<div class="container">
-		<div class="d-flex justify-content-center py-2">
-			<a th:href="@{/}"
-				class="link-dark link-offset-2  link-underline link-underline-opacity-0 d-flex align-items-center">
-				<img th:src="@{/static/images/logo.jpg}" width="42" height="42"
-				style="border-radius: 50%;" /> <span class="display-6">모의투자</span>
-			</a>
-		</div>
-
-		<div class="border rounded-2">
-			<form th:action="@{/register}" method="post" class="p-5"
+		<div th:replace="~{index::banner}"></div>
+		<div style="width: 448px;" class="m-auto border rounded-2">
+			<form th:action="@{/register}" method="post" class="p-4"
 				autocomplete="off">
 				<div>
-					<h2>신규계정</h2>
+					<h2>
+						신규계정<span class="text-secondary" style="font-size: small;">신청하기</span>
+					</h2>
 				</div>
 				<div class="py-1">
-					<label>계정</label> <input name="username" type="email"
-						class="form-control form-control-sm" placeholder="이메일 형식" />
+					<label>계정(*)</label> <input type="email"
+						th:field="${newAccount.username}"
+						class="form-control form-control-sm" th:errorclass="is-invalid"
+						placeholder="이메일 형식" /> <span class="text-danger"
+						th:if="${#fields.hasErrors('newAccount.username')}">이메일형식의
+						입력이 필요합니다.</span>
 				</div>
 				<div class="py-1">
-					<label>비밀번호</label> <input name="password" type="password"
-						class="form-control form-control-sm" placeholder="최소 4글자" />
+					<label>비밀번호(*)</label> <input type="password"
+						th:field="${newAccount.password}"
+						class="form-control form-control-sm" placeholder="최소 4글자"
+						th:errorclass="is-invalid" /> <span class="text-danger"
+						th:if="${#fields.hasErrors('newAccount.password')}">4글자에서
+						12글자까지 설정가능합니다.</span>
 				</div>
 				<div class="py-1">
 					<label>비밀번호 재입력</label> <input type="password"
 						class="form-control form-control-sm" />
 				</div>
 				<div class="py-1">
-					<label>닉네임</label> <input name="nickname" type="text"
-						class="form-control form-control-sm" placeholder="최소 2글자" />
+					<label>닉네임(*)</label> <input type="text"
+						th:field="${newAccount.nickname}"
+						class="form-control form-control-sm" placeholder="최소 2글자"
+						th:errorclass="is-invalid" /> <span class="text-danger"
+						th:if="${#fields.hasErrors('newAccount.password')}">2글자에서
+						7글자까지 설정가능합니다.</span>
 				</div>
 				<div class="mt-2 py-1">
 					<button class="btn btn-dark form-control">계정신청</button>
