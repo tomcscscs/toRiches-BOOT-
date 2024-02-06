@@ -3,6 +3,7 @@ package org.edupoll.app.controller;
 import org.edupoll.app.command.NewAccount;
 import org.edupoll.app.entity.Account;
 import org.edupoll.app.service.AccountService;
+import org.edupoll.app.service.MailService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -19,15 +20,22 @@ import lombok.RequiredArgsConstructor;
 public class AccountController {
 
 	private final AccountService accountService;
+	private final MailService mailService;
+	
 
 	
 	@GetMapping("/signin")
 	public String showAccountSignin(@RequestParam(required=false) String username, Model model) {
 		if(username == null) {
-			return "account/account-input-username";
+			return "account/signin-username";
 		}else {
 			model.addAttribute("username", username);
-			return "account/account-input-password";
+			
+			if(accountService.readAccountByUserName(username) == null) {
+				model.addAttribute("notfound", true);
+				return "account/signin-username";
+			}
+			return "account/signin-password";
 		}
 	}
 	
@@ -40,23 +48,27 @@ public class AccountController {
 		Account dummy = Account.builder().build();
 		model.addAttribute("newAccount", dummy);
 
-		return "account/account-register-form";
+		return "account/register-account";
 	}
 
 	@PostMapping("/register")
-	public String proceedAccountRegister(@ModelAttribute @Valid NewAccount cmd, BindingResult result, Model model) {
+	public String proceedAccountRegister(@ModelAttribute @Valid NewAccount cmd, BindingResult result, 
+			Model model) {
 		if (result.hasErrors()) {
-//			System.out.println(result.getFieldError("username"));
-//			System.out.println(result.getFieldError("password"));
-//			System.out.println(result.getFieldError("nickname"));
-//			model.addAttribute("newAccount", cmd);
-			return "account/account-register-form";
+			return "account/register-account";
 		}
 
 		boolean isCreated = accountService.createNewAccount(cmd);
 		if (!isCreated) {
+			
 			return "redirect:/register/conflict?username=" + cmd.getUsername();
 		}
+		
+		
+		mailService.sendWelcomeMimeMessage(cmd.getUsername());
+		
+//		mailService.sendWelcomMail(cmd.getUsername());
+		
 
 		return "redirect:/";
 	}
@@ -66,6 +78,6 @@ public class AccountController {
 
 		model.addAttribute("username", username);
 
-		return "account/account-register-conflict";
+		return "account/register-conflict";
 	}
 }

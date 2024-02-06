@@ -13,7 +13,7 @@
 		<div th:replace="~{index::banner}"></div>
 		<div style="width: 448px;" class="m-auto border rounded-2">
 			<form th:action="@{/register}" method="post" class="p-4"
-				autocomplete="off">
+				id="register" autocomplete="off">
 				<div>
 					<h2>
 						신규계정<span class="text-secondary" style="font-size: small;">신청하기</span>
@@ -48,7 +48,13 @@
 						7글자까지 설정가능합니다.</span>
 				</div>
 				<div class="mt-2 py-1">
-					<button class="btn btn-dark form-control">계정신청</button>
+					<button class="btn btn-dark form-control" id="sbt">계정신청</button>
+				</div>
+				<div class="mt-2 py-1" style="font-size: small;">계정을 생성하면 사용
+					조건 및 개인정보 보호정책 에 동의하게 됩니다.</div>
+				<hr />
+				<div class="mt-2 py-1" style="font-size: small;">
+					이미 계정을 가지고 있으신가요? <a th:href="@{/signin}">로그인</a>
 				</div>
 			</form>
 		</div>
@@ -56,5 +62,18 @@
 
 	<script
 		src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+	<script>
+		document.querySelector("#register").addEventListener("submit",
+				function(e) {
+					document.querySelector("#sbt").disabled = true;
+					// document.querytSelector("#sbt").enabled=false;
+				});
+	</script>
+
 </body>
 </html>
+
+
+
+
+
