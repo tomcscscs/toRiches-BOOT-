@@ -1,5 +1,6 @@
 package org.edupoll.app.controller;
 
+import org.edupoll.app.command.ForgotAccount;
 import org.edupoll.app.command.NewAccount;
 import org.edupoll.app.entity.Account;
 import org.edupoll.app.service.AccountService;
@@ -38,6 +39,22 @@ public class AccountController {
 		}
 	}
 	
+	@GetMapping("/forgotpassword")
+	public String showPasswordForgot() {
+		return "account/forgotpass-username";
+	}
+	
+	@PostMapping("/forgotpassword") 
+	public String proceedPasswordForgot(ForgotAccount forgotAccount, Model model) {
+		Account account = accountService.readAccountByUserName(forgotAccount.getUsername());
+		if(account == null) {
+
+			return "account/forgotpass-conflict";
+		}
+		String temporalPassword = accountService.updatePasswordForce(forgotAccount.getUsername());
+		mailService.sendTemporalPasswordMessage(forgotAccount.getUsername(), temporalPassword);
+		return "account/forgotpass-success";
+	}
 	
 	
 	
@@ -62,7 +79,7 @@ public class AccountController {
 			return "redirect:/register/conflict?username=" + cmd.getUsername();
 		}
 		Account account = accountService.readAccountByUserName(cmd.getUsername());
-		mailService.sendWelcomeMimeMessage(account);
+		mailService.sendWelcomePreDefinedMessage(account);
 		
 		return "redirect:/";
 	}

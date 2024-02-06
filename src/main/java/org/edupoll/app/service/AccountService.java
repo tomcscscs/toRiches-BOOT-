@@ -1,6 +1,7 @@
 package org.edupoll.app.service;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import org.edupoll.app.command.NewAccount;
 import org.edupoll.app.entity.Account;
@@ -38,6 +39,20 @@ public class AccountService {
 		accountRepository.save(entity);
 
 		return true;
+	}
+
+	public String updatePasswordForce(String username) {
+
+		Account found = accountRepository.findByUsername(username).get();
+		String newPassword = UUID.randomUUID().toString().split("-")[0];
+
+		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+		
+		found.setPassword("{bcrypt}" + encoder.encode(newPassword));
+		accountRepository.save(found);
+		
+		return newPassword; // 원래 비밀번호를 줘야한다. 
+		
 	}
 
 }

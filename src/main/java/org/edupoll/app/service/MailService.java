@@ -75,5 +75,25 @@ public class MailService {
 		 */
 
 	}
+	
+	public void sendTemporalPasswordMessage(String target) {
+
+		SimpleMailMessage message = new SimpleMailMessage();
+
+		message.setTo(target);
+		message.setFrom("no-reply@gmail.com");
+		message.setSubject("[투리치스]환영합니다.");
+		String text = "투리치스에 회원이 되신걸 환영합니다.\n";
+		message.setText(target);
+
+		try {
+			javaMailSender.send(message);
+		} catch (Exception e) {
+			log.warn(e.getMessage());
+		}
+
+	}
+
+	
 
 }
