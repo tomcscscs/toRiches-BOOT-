@@ -22,7 +22,6 @@ public class AccountController {
 	private final AccountService accountService;
 	private final MailService mailService;
 	
-
 	
 	@GetMapping("/signin")
 	public String showAccountSignin(@RequestParam(required=false) String username, Model model) {
@@ -60,19 +59,14 @@ public class AccountController {
 
 		boolean isCreated = accountService.createNewAccount(cmd);
 		if (!isCreated) {
-			
 			return "redirect:/register/conflict?username=" + cmd.getUsername();
 		}
+		Account account = accountService.readAccountByUserName(cmd.getUsername());
+		mailService.sendWelcomeMimeMessage(account);
 		
-		
-		mailService.sendWelcomeMimeMessage(cmd.getUsername());
-		
-//		mailService.sendWelcomMail(cmd.getUsername());
-		
-
 		return "redirect:/";
 	}
-
+ 
 	@GetMapping("/register/conflict")
 	public String proceedAccountRegister(@RequestParam String username, Model model) {
 

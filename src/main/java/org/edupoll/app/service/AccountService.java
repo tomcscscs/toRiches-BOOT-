@@ -32,7 +32,6 @@ public class AccountService {
 		}
 
 		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-		
 		Account entity = Account.builder().username(newAccount.getUsername())//
 				.password("{bcrypt}" + encoder.encode(newAccount.getPassword()))//
 				.nickname(newAccount.getNickname()).build();
