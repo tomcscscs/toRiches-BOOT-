@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import lombok.RequiredArgsConstructor;
@@ -37,7 +38,7 @@ public class TradeController {
 		return "trade/item-detail";
 	}
 
-	@GetMapping("/api/pricelog/{id}")
+	@GetMapping("/api/pricelog/{id}") // ajax
 	@ResponseBody
 	public ChartDataSet handlePriceLogApi(@PathVariable Integer id) {
 
@@ -53,6 +54,20 @@ public class TradeController {
 	public String handleEntitiyNotFoundException() {
 //		return "redirect:/";
 		return "trade/item-not-found";
+	}
+
+	@GetMapping("/main")
+	public String showLogListAll(Model model) {
+		List<TradeItemPriceLog> itemLog = tradeItemPriceLogRepository.findAll();
+		model.addAttribute("loglist", itemLog );
+		
+		return "trade/item-main";
+	}
+	
+	@GetMapping("/{id}/callback")
+	public String showSpecificTradeItem(@PathVariable Integer id) {
+		
+		return "redirect:/trade/" + id;
 	}
 
 }
