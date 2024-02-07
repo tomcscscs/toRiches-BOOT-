@@ -76,24 +76,27 @@ public class MailService {
 
 	}
 	
-	public void sendTemporalPasswordMessage(String target) {
+	public void sendTemporalPasswordMessage(String target, String temporalPassword) {
 
 		SimpleMailMessage message = new SimpleMailMessage();
 
 		message.setTo(target);
 		message.setFrom("no-reply@gmail.com");
-		message.setSubject("[투리치스]환영합니다.");
-		String text = "투리치스에 회원이 되신걸 환영합니다.\n";
-		message.setText(target);
+		message.setSubject("[투리치스] 비밀번호 임시 재발급");
 
+		String text = "회원님이 계정 비밀번호가 " +temporalPassword+" 로 변경되었습니다.\n";
+		text += "임시 비밀번호로 로그인 후 새로운 비밀번호를 설정하시는 걸 권장합니다.";
+		message.setText(text);
 		try {
 			javaMailSender.send(message);
 		} catch (Exception e) {
-			log.warn(e.getMessage());
+			log.warn("Fail to send mail. Cause : " + e.getMessage());
 		}
 
 	}
-
+	
 	
 
 }
+	
+

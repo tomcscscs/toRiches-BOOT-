@@ -25,6 +25,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 		if (optional.isEmpty()) {
 			throw new UsernameNotFoundException(username + " is not exist");
 		}
+		
 		Account got = optional.get();
 
 		return new User(got.getUsername(), got.getPassword(), new ArrayList<>());//

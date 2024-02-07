@@ -79,7 +79,7 @@ public class AccountController {
 			return "redirect:/register/conflict?username=" + cmd.getUsername();
 		}
 		Account account = accountService.readAccountByUserName(cmd.getUsername());
-		mailService.sendWelcomePreDefinedMessage(account);
+		mailService.sendWelcomeMimeMessage(account);
 		
 		return "redirect:/";
 	}
