@@ -4,9 +4,12 @@ import java.util.List;
 import java.util.Random;
 
 import org.edupoll.app.entity.TradeItem;
+import org.edupoll.app.entity.TradeItemPriceLog;
+import org.edupoll.app.repository.TradeItemPriceLogRepository;
 import org.edupoll.app.repository.TradeItemRepository;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,48 +20,40 @@ import lombok.extern.slf4j.Slf4j;
 public class BackgroundService {
 
 	private final TradeItemRepository tradeItemRepository;
+	private final TradeItemPriceLogRepository tradeItemPriceLogRepository;
 
-	@Scheduled(cron = "*/15 * * * * ?")
+	@Scheduled(cron = "*/30 * * * * ?")
+	@Transactional
 	public void updateTradeItemsPrice() {
 		Random random = new Random();
 		List<TradeItem> tradeItems = tradeItemRepository.findAll();
-		tradeItems.stream().forEach(t -> {
-			int r = random.nextInt(0, 10);
-			if (r < 4) {
+
+		List<TradeItemPriceLog> tradeItemPriceLogs = tradeItems.stream().map(t -> {
+			if (Math.random() < 0.4)
 				t.setTrend(!t.getTrend());
-			}
 			// =============================================
-			double start = 0;
-			double end = 0;
-			if (t.getTrend()) {
-				start = 1.0;
-				end = 1.3;
-			} else {
+			double start = 1.0;
+			double end = 1.3;
+			if (!t.getTrend()) {
 				start = 0.7;
 				end = 1.0;
 			}
-			int current = t.getPrice().getCurrent();
-			double rate = random.nextDouble(start, end);
-			current *= rate;
-			current = current / 100 * 100;
+			int price = t.getPrice().getCurrent();
 
-			if (current > t.getPrice().getMaximum()) {
-				t.getPrice().setCurrent(t.getPrice().getMaximum());
-			} else if (current < t.getPrice().getMinimum()) {
-				t.getPrice().setCurrent(t.getPrice().getMinimum());
-			} else {
-				t.getPrice().setCurrent(current);
-			}
-//			tradeItemRepository.save(t);
-		});
+			double rate = random.nextDouble(start, end);
+			int updatedPrice = (int) (price * rate) / 100 * 100;
+
+			updatedPrice = updatedPrice > t.getPrice().getMaximum() ? t.getPrice().getMaximum()
+					: (updatedPrice < t.getPrice().getMinimum() ? t.getPrice().getMinimum() : updatedPrice);
+
+			t.getPrice().setCurrent(updatedPrice);
+
+			return TradeItemPriceLog.builder().tradeItem(t).previousPrice(price).updatedPrice(updatedPrice).build();
+		}).toList();
 
 		tradeItemRepository.saveAll(tradeItems);
-		
-		log.info("Item price udpated. result : {}", tradeItems.size());
-		
-		/*
-		 * for(TradeItem t : tradeItems) { t.getPrice().getCurrent(); }
-		 */
+		tradeItemPriceLogRepository.saveAll(tradeItemPriceLogs);
+		// log.info("Item price udpated. result : {}", tradeItems.size());
 	}
 
 }
