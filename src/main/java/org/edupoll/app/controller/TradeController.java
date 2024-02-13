@@ -31,6 +31,7 @@ public class TradeController {
 	@GetMapping("/{id}")
 	public String showSpecificTradeItem(@PathVariable Integer id, Model model) {
 		TradeItem item = tradeItemRepository.findById(id).get();
+		
 		List<TradeItemPriceLog> priceLogs = tradeItemPriceLogRepository.findTop5ByTradeItemOrderByUpdatedAtDesc(item);
 
 		model.addAttribute("item", item);

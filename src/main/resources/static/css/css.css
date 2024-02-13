@@ -1,0 +1,19 @@
+@charset "UTF-8";
+
+.background-image {
+	background-image: url('/static/images/spring-field.jpg');
+	background-size: cover;
+	background-position: center;
+	width: 36px; /* 이미지의 너비와 높이에 맞게 조정 */
+	height: 36px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: 50%;
+	filter: blur(100px); /* 블러 효과 추가 */
+}
+
+/* style.css */
+.blur-image {
+    filter: blur(5px);
+}

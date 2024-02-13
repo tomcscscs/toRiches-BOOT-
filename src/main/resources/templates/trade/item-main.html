@@ -8,14 +8,17 @@
 <body>
 <h1>아이템</h1>	
 
-<th:block th:each="var : ${loglist}">
+<!-- <th:block th:each="var : ${loglist}">
     <a th:text="${var.previousPrice + ' ' + var.updatedAt}" th:href="@{/index}"></a>
     <hr>
 </th:block>
 
-<span class="placeholder col-12" th:each="var: ${loglist}"></span>
+<span class="placeholder col-12" th:each="var: ${loglist}"></span> -->
 
-<span class="placeholder col-12 bg-primary" th:text="${var.previousPrice}"></span>
+
+<span class="placeholder col-12"></span>
+
+<span class="placeholder col-12 bg-primary"></span>
 <span class="placeholder col-12 bg-secondary"></span>
 <span class="placeholder col-12 bg-success"></span>
 <span class="placeholder col-12 bg-danger"></span>
@@ -23,7 +26,6 @@
 <span class="placeholder col-12 bg-info"></span>
 <span class="placeholder col-12 bg-light"></span>
 <span class="placeholder col-12 bg-dark"></span>
-
 
 
 

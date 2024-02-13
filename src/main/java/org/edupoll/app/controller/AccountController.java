@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -22,32 +24,31 @@ public class AccountController {
 
 	private final AccountService accountService;
 	private final MailService mailService;
-	
-	
+
 	@GetMapping("/signin")
-	public String showAccountSignin(@RequestParam(required=false) String username, Model model) {
-		if(username == null) {
+	public String showAccountSignin(@RequestParam(required = false) String username, Model model) {
+		if (username == null) {
 			return "account/signin-username";
-		}else {
+		} else {
 			model.addAttribute("username", username);
-			
-			if(accountService.readAccountByUserName(username) == null) {
+
+			if (accountService.readAccountByUserName(username) == null) {
 				model.addAttribute("notfound", true);
 				return "account/signin-username";
 			}
 			return "account/signin-password";
 		}
 	}
-	
+
 	@GetMapping("/forgotpassword")
 	public String showPasswordForgot() {
 		return "account/forgotpass-username";
 	}
-	
-	@PostMapping("/forgotpassword") 
+
+	@PostMapping("/forgotpassword")
 	public String proceedPasswordForgot(ForgotAccount forgotAccount, Model model) {
 		Account account = accountService.readAccountByUserName(forgotAccount.getUsername());
-		if(account == null) {
+		if (account == null) {
 
 			return "account/forgotpass-conflict";
 		}
@@ -55,10 +56,7 @@ public class AccountController {
 		mailService.sendTemporalPasswordMessage(forgotAccount.getUsername(), temporalPassword);
 		return "account/forgotpass-success";
 	}
-	
-	
-	
-	
+
 	@GetMapping("/register")
 	public String showAccountRegister(Model model) {
 		Account dummy = Account.builder().build();
@@ -68,8 +66,7 @@ public class AccountController {
 	}
 
 	@PostMapping("/register")
-	public String proceedAccountRegister(@ModelAttribute @Valid NewAccount cmd, BindingResult result, 
-			Model model) {
+	public String proceedAccountRegister(@ModelAttribute @Valid NewAccount cmd, BindingResult result, Model model) {
 		if (result.hasErrors()) {
 			return "account/register-account";
 		}
@@ -80,10 +77,10 @@ public class AccountController {
 		}
 		Account account = accountService.readAccountByUserName(cmd.getUsername());
 		mailService.sendWelcomeMimeMessage(account);
-		
+
 		return "redirect:/";
 	}
- 
+
 	@GetMapping("/register/conflict")
 	public String proceedAccountRegister(@RequestParam String username, Model model) {
 
@@ -91,4 +88,18 @@ public class AccountController {
 
 		return "account/register-conflict";
 	}
+
+	@GetMapping("/logout")
+	public String logout(HttpServletRequest request) {
+		HttpSession session = request.getSession(false);
+
+		if (session != null) {
+			session.invalidate();
+
+		}
+
+		return "redirect:/index";
+
+	}
+
 }
