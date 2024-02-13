@@ -24,7 +24,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import jakarta.validation.Valid;
@@ -39,7 +38,6 @@ public class TradeController {
 	private final TradeItemPriceLogRepository tradeItemPriceLogRepository;
 	private final TradeService tradeService;
 	
-
 	@GetMapping("/{id}")
 	public String showSpecificTradeItem(@PathVariable Integer id, Model model, 
 						Authentication authentication) {
@@ -59,8 +57,45 @@ public class TradeController {
 		return "trade/item-detail";
 	}
 	
+	
+	@PostMapping("/{id}/purchase")
+	public String proceedPurchaseItem(Authentication authentication , @PathVariable Integer id, 
+			@Valid PurchaseItem cmd, BindingResult result) {
+		if(result.hasErrors()) {
+			return "trade/purchase-conflict";
+		}
+		boolean confirmed = tradeService.confirmPurchase(authentication.getName(), id, cmd.getQuantity());
+		if(!confirmed) {
+			return "trade/purchase-conflict";
+		}
+		return "redirect:/private/inventory";
+	}
+	
+	
+	@PutMapping("/{id}/sales")
+	public String proceedSalesItem(Authentication authentication , @PathVariable Integer id, 
+			@Valid SalesItem cmd, BindingResult result) {
+		if(result.hasErrors()) {
+			return "trade/sales-conflict";
+		}
+		boolean confirmed = tradeService.confirmSales(authentication.getName(), id, cmd.getQuantity());
+		if(!confirmed) {
+			return "trade/sales-conflict";
+		}
+		
+		return "redirect:/private/inventory";
+	}
+	
+	
+	
+	@GetMapping("/{id}/callback")
+	public String showSpecificTradeItem(@PathVariable Integer id) {
+		
+		return "redirect:/trade/"+id;
+	}
+	
 
-	@GetMapping("/api/pricelog/{id}") // ajax
+	@GetMapping("/api/pricelog/{id}")
 	@ResponseBody
 	public ChartDataSet handlePriceLogApi(@PathVariable Integer id) {
 
@@ -77,50 +112,5 @@ public class TradeController {
 //		return "redirect:/";
 		return "trade/item-not-found";
 	}
-
-	@GetMapping("/main")
-	public String showLogListAll(Model model) {
-		List<TradeItemPriceLog> itemLog = tradeItemPriceLogRepository.findAll();
-		model.addAttribute("loglist", itemLog );
-		
-		return "trade/item-main";
-	}
-	
-	@GetMapping("/{id}/callback")
-	public String showSpecificTradeItem(@PathVariable Integer id) {
-		
-		return "redirect:/trade/" + id;
-	}
-	
-	
-	
-	@PostMapping("/{id}/purchase")
-	public String proceedPurchaseItem(Authentication authentication , @PathVariable Integer id, 
-			@Valid PurchaseItem cmd, BindingResult result) {
-		if(result.hasErrors()) {
-			return "trade/purchase-conflict";
-		}
-		boolean confirmed = tradeService.confirmPurchase(authentication.getName(), id, cmd.getQuantity());
-		if(!confirmed) {
-			return "trade/purchase-conflict";
-		}
-		return "redirect:/private/order-history";
-	}
-	
-	@PutMapping("/{id}/sales")
-	public String proceedSalesItem(Authentication authentication , @PathVariable Integer id, 
-			@Valid SalesItem cmd, BindingResult result) {
-		if(result.hasErrors()) {
-			return "trade/sales-conflict";
-		}
-		boolean confirmed = tradeService.confirmSales(authentication.getName(), id, cmd.getQuantity());
-		if(!confirmed) {
-			return "trade/sales-conflict";
-		}
-		
-		return "redirect:/private/order-history";
-	}
-	
-	
 
 }
