@@ -15,7 +15,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class CustomUserDetailsService implements UserDetailsService {
+public class CustomUserDetailsService implements UserDetailsService {//account를 여기에 추가하려면 따로 클래로 뺴야해.
 
 	private final AccountRepository accountRepository;
 

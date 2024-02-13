@@ -7,19 +7,12 @@
 	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
 	rel="stylesheet" />
 <link th:href="@{/static/css/style.css}" rel="stylesheet" />
-<style>
-@import
-	url('https://fonts.googleapis.com/css2?family=Gugi&display=swap');
-</style>
 </head>
 <body>
-
-	<div replace="banner :: banner" style="font-family:'Gugi', sans-serif ">
-
 	<div class="container py-3">
 		<!-- chart view -->
-		<div style="position: relative; height:35vh;" class="mb-2">
-			<canvas id="chart" th:data-target="${item.id}" ></canvas>
+		<div style="position: relative; height: 35vh;" class="mb-2">
+			<canvas id="chart" th:data-target="${item.id}"></canvas>
 		</div>
 
 		<!-- item & purchase view -->
@@ -56,23 +49,95 @@
 				</div>
 			</div>
 
-			<!-- purchace view -->
+
 			<div class="col-12 col-md-6">
-				<div th:if="${#authentication}">
-					<h1>로그인 완료</h1>
+				<!-- 구매 / 판매 뷰-->
+				<div class="card" th:if="${#authentication}">
+					<div class="card-header">
+						<ul class="nav nav-tabs card-header-tabs">
+							<li class="nav-item"><a class="nav-link active"
+								aria-current="true" href="#" data-bs-toggle="tab"
+								data-bs-target="#purchase-tab-pane">구매</a></li>
+							<li class="nav-item"><a class="nav-link" href="#"
+								data-bs-toggle="tab" data-bs-target="#sales-tab-pane">판매</a></li>
+						</ul>
+					</div>
+					<div class="card-body">
+						<div class="tab-content">
+							<div class="tab-pane fade show active" id="purchase-tab-pane"
+								role="tabpanel" tabindex="0">
+								<form th:action="@{/trade/{id}/purchase(id=${item.id})}"
+									method="post">
+									<div class="mb-2">
+										<input type="hidden" name="itemId" th:value="${item.id}" /> <input
+											type="number" class="form-control text-end" name="quantity"
+											id="quantity" th:data-current-price="${item.price.current}"
+											th:data-balance="${authenticatedAccount.balance}"
+											placeholder="구매 희망 수량" value="0" min="1" max="100"/>
+									</div>
+									<div 
+										class="mb-2 gap-2 text-truncate
+										d-flex justify-content-end fs-7 text-secondary">
+										<span
+											th:text="
+										${#numbers.formatCurrency(authenticatedAccount.balance)}"></span>
+										- <span id="price">&#8361;0</span> = <span id="result"
+											th:text="
+										${#numbers.formatCurrency(authenticatedAccount.balance)}"></span>
+									</div>
+									<div class="d-flex justify-content-end">
+										<button type="submit" class="btn btn-dark btn-sm">구매
+											신청</button>
+									</div>
+								</form>
+
+							</div>
+							<div class="tab-pane fade" id="sales-tab-pane" role="tabpanel"
+								tabindex="0">
+								<h5 class="card-title">구매</h5>
+								<p class="card-text">With supporting text below as a natural
+									lead-in to additional content.</p>
+							</div>
+						</div>
+					</div>
 				</div>
-				<div th:unless="${#authentication}">
-					<a th:href="@{/signin}">로그인이 필요합니다.</a> 
+
+				<!-- 로그인 유도 뷰 -->
+				<div th:unless="${#authentication}"
+					class="d-flex justify-content-center align-items-center"
+					style="height: 100%;">
+					<a th:href="@{/trade/{id}/callback(id=${item.id})}">로그인이 필요합니다</a>
 				</div>
 			</div>
 		</div>
 
 	</div>
-</div>
+
 	<script
 		src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 	<script>
+		if(document.querySelector("#quantity")) {
+			document.querySelector("#quantity").addEventListener("input",
+					function(e) {
+						const value = e.target.value *1;
+						const current = e.target.dataset.currentPrice *1;
+						const balance = e.target.dataset.balance *1;
+						// console.log(value, current, balance);
+						const $price = document.querySelector("#price");
+						const $result = document.querySelector("#result")
+	
+						const price = value ? current * value : 0;
+						const result = value ? balance - price : balance;
+						$price.innerHTML = "&#8361;" + price.toLocaleString();
+						$result.innerHTML = "&#8361;" + result.toLocaleString();
+						
+						$result.className=result < 0 ? "text-danger" :"";
+						
+						
+					});
+		}
+		
 		const ctx = document.getElementById("chart");
 
 		document.addEventListener("DOMContentLoaded", function() {
@@ -90,6 +155,7 @@
 							label : '가격변동 그래프',
 							data : obj.data,
 							tension : 0.1
+
 						} ]
 					},
 					options : {
