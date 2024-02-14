@@ -74,7 +74,6 @@ public class TradeService {
 
 		Inventory inventory = inventoryRepositoy.findByOwnerAndTarget(account, tradeItem);
 		// - 실제 판매하고자 하는 아이템을 가지고 있어야 한다. (수량 역시 만족하여야함)
-		
 		if (inventory == null || inventory.getTotal() < quantitiy) {
 			return false;
 		}

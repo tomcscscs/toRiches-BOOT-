@@ -14,16 +14,13 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 @Entity
-public class Inventory  {
-	
+public class Inventory {
 	@Id
 	@GeneratedValue(strategy = GenerationType.UUID)
-	
 	private String id;
-	
 	
 	@ManyToOne
 	private Account owner;
@@ -34,7 +31,16 @@ public class Inventory  {
 	private Integer total;
 	
 	private Double average;
-	
-	
 
 }
+
+
+
+
+
+
+
+
+
+
+

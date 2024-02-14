@@ -2,25 +2,22 @@ package org.edupoll.app.entity;
 
 import org.edupoll.app.entity.embeddable.Price;
 
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
-import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Getter
 @Setter
-@Builder
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 @Entity
 public class TradeItem {
 	@Id
@@ -28,13 +25,13 @@ public class TradeItem {
 	private Integer id;
 
 	private String name;
+	private Price price;
 
-	@ManyToOne	
+	private Boolean trend;
+	private Integer stock;
+	
+	
+	@ManyToOne
 	private TradeType type;
 
-	private Price price;
-	
-	private Boolean trend;
-	
-	
 }
