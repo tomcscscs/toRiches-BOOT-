@@ -16,7 +16,6 @@ import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class BackgroundService {
 
 	private final TradeItemRepository tradeItemRepository;
@@ -56,4 +55,26 @@ public class BackgroundService {
 		// log.info("Item price udpated. result : {}", tradeItems.size());
 	}
 
+	
+	
+	@Scheduled(cron = "0 */5 * * * ?")
+	@Transactional
+	public void updateTradeItemsStock() {
+		Random random = new Random();
+		List<TradeItem> tradeItems = tradeItemRepository.findAll();
+		
+		
+
+		for(TradeItem one : tradeItems) {
+			
+			if(Math.random() >0.5) {
+				continue;
+			}
+			
+			int r = random.nextInt(1, 5);
+			one.setStock(one.getStock() + r*50);
+		}
+
+		tradeItemRepository.saveAll(tradeItems);
+	}
 }

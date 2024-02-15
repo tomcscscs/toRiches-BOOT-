@@ -1,8 +1,10 @@
 -- 
-insert into account 
+insert into accounts 
 (username, password, nickname, balance, status ) values
 ('shizo@naver.com', '{bcrypt}$2a$12$6pVzOA7k.oe7rzwlTAZBm.faAVuZhPTu5YmdYwK9KuVp29HDN.yy.', '마스터', 10000000, 1),
-('totoro@gmail.com', '{bcrypt}$2a$12$hllXazQcWyNU50oqS.jleObzqJxirViuuoo9Wq32B234dxkdcvBuy', '토토로',300000, 0);
+('totoro@gmail.com', '{bcrypt}$2a$12$hllXazQcWyNU50oqS.jleObzqJxirViuuoo9Wq32B234dxkdcvBuy', '토토로',300000, 0),
+('tom@gmail.com', '{bcrypt}$2a$12$ZgLvI/az.VPVIlJuoMU7bu2uHMaKlQzDuLnNnZZ.4K6v73eBV5.9m' , 'crack', 50000, 1);
+
 
 
 -- 

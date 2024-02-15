@@ -95,17 +95,7 @@ public class TradeController {
 	}
 	
 
-	@GetMapping("/api/pricelog/{id}")
-	@ResponseBody
-	public ChartDataSet handlePriceLogApi(@PathVariable Integer id) {
-
-		List<TradeItemPriceLog> priceLogs = tradeItemPriceLogRepository.findByTradeItemIdOrderByUpdatedAtAsc(id);
-
-		List<Integer> updatePrices = priceLogs.stream().map(t -> t.getUpdatedPrice()).toList();
-		List<LocalDateTime> updatedAts = priceLogs.stream().map(t -> t.getUpdatedAt()).toList();
-
-		return new ChartDataSet(updatePrices, updatedAts);
-	}
+	
 
 	@ExceptionHandler(NoSuchElementException.class)
 	public String handleEntitiyNotFoundException() {

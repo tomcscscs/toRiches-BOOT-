@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
-<title>Insert title here</title>
+<title th:text="|장사의 신 - ${item.name}|"></title>
 <link
 	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
 	rel="stylesheet" />
@@ -18,19 +18,26 @@
 		<!-- item & purchase view -->
 		<div class="row ">
 			<!-- item view -->
-			<div class="col-12 col-md-6">
+			<div class="col-12 col-md-6" id="itemView" th:data-id="${item.id}">
 				<div class="card">
-					<div class="card-header d-flex justify-content-between">
+					<div
+						class="card-header d-flex justify-content-between align-items-end">
 						<div>
 							<span th:text="${item.name}" class="fs-5"></span> <span
 								class="badge bg-secondary" th:text="${item.type.name}"></span> <span
-								th:if="${item.trend}" class="badge bg-primary">유행중</span>
+								id="trendBadge"
+								th:styleappend="${item.trend}? '' : 'display:none'"
+								class="badge bg-primary">유행중</span>
 						</div>
-						<div>
-							<span th:text="${#numbers.formatCurrency(item.price.current)}"></span>
+						<div class="fs-7">
+							<span id="currentPrice"
+								th:text="${#numbers.formatCurrency(item.price.current)}"></span>
+							/ <span>재고 :</span> <span id="currentStock"
+								th:text="${#numbers.formatInteger(item.stock, 0, 'COMMA')}"></span>
+							<span>개</span>
 						</div>
 					</div>
-					<ul class="list-group list-group-flush">
+					<ul class="list-group list-group-flush" id="priceLog">
 						<li
 							class="list-group-item d-flex justify-content-between py-1 fs-6"
 							th:each="log : ${priceLogs}">
@@ -44,7 +51,6 @@
 									th:text="${#temporals.format(log.updatedAt, 'HH:mm:ss')}"></span>
 							</div>
 						</li>
-
 					</ul>
 				</div>
 			</div>
@@ -117,14 +123,102 @@
 		src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 	<script>
-			document.querySelector("#quantity")?.addEventListener("input",function(e) {
-				const value = e.target.value * 1;
-				const current = e.target.dataset.currentPrice * 1;
-				const balance = e.target.dataset.balance * 1;
-				// console.log(value, current, balance);
-				const $price = document.querySelector("#price");
-				const $result = document
-						.querySelector("#result")
+	
+		/*  최신 아이템 상태 받아와서 뷰 변경 시키는 처리 */
+		function updateLatestDataSet() {
+			const id =document.querySelector("#itemView").dataset.id;
+			fetch("/trade/api/latest/"+id, {
+				
+			}).then(function(response) {
+				return response.json();
+			}).then(function(obj) {
+				// 트렌드 배지 처리
+				document.querySelector("#trendBadge").style.display 
+													= obj.tradeItem.trend ? '' : 'none';
+				
+				document.querySelector("#currentPrice").innerHTML = "&#8361;"+
+													obj.tradeItem.price.current.toLocaleString();
+				document.querySelector("#currentStock").innerHTML = obj.tradeItem.stock.toLocaleString();
+				
+				
+				document.querySelector("#priceLog").innerHTML =  "";
+				
+				const lis = obj.latestLog.map(e => {
+					const li = document.createElement("li");
+						li.className = "list-group-item d-flex justify-content-between py-1 fs-6";
+					const div1 = document.createElement("div");	
+						const span11 = document.createElement("span");
+							span11.innerHTML = "&#8361;"+e.previousPrice.toLocaleString();
+						const span12 = 	document.createElement("span");
+							span12.innerHTML = " ▶ ";
+						const span13 = 	document.createElement("span");
+							span13.innerHTML = "&#8361;"+e.updatedPrice.toLocaleString();
+						div1.append(span11, span12, span13);
+					const div2 = document.createElement("div");
+						div2.className="fs-7 text-secondary";
+						const span21 = 	document.createElement("span");
+						span21.innerHTML = e.updatedAt.split("T")[1].substr(0, 8);
+						div2.append(span21);
+					li.append(div1, div2);	
+					return li;
+				});
+				document.querySelector("#priceLog").append(...lis);
+			});
+		}
+		
+		/* 최신 가격변동 로그 가지고와서 차트 그리기 */
+		
+		let char = null;
+		
+		
+		function drawChart() {
+			const ctx = document.getElementById("chart");
+			const target = ctx.dataset.target;
+			fetch("/trade/api/pricelog/" + target, {
+
+			}).then(function(response) {
+				return response.json();
+			}).then(function(obj) {
+				
+				
+				new Chart(ctx, {
+					type : "line",
+					data : {
+						labels : obj.labels,
+							datasets : [ {
+								label : '가격변동 그래프',
+								data : obj.data,
+								tension : 0.1
+
+							} ]
+						},
+						options : {
+							maintainAspectRatio : false,
+							plugins : {
+								legend : {
+									display : false
+								}
+							},
+							scales : {
+								x : {
+									display : false
+								}
+							}
+						}
+					});
+				});
+			}
+
+	
+		/* 구매 개수 변동에 따른 스크립트 처리 */
+		document.querySelector("#quantity")?.addEventListener("input",function(e) {
+			const value = e.target.value * 1;
+			const current = e.target.dataset.currentPrice * 1;
+			const balance = e.target.dataset.balance * 1;
+			// console.log(value, current, balance);
+			const $price = document.querySelector("#price");
+			const $result = document
+					.querySelector("#result")
 
 				const price = value ? current * value : 0;
 				const result = value ? balance - price
@@ -136,44 +230,12 @@
 
 				$result.className = result < 0 ? "text-danger"
 						: "";
-
-			});
+		});
 		
 
 		document.addEventListener("DOMContentLoaded", function() {
-			const ctx = document.getElementById("chart");
-			const target = ctx.dataset.target;
-			fetch("/trade/api/pricelog/" + target, {
-
-			}).then(function(response) {
-				return response.json();
-			}).then(function(obj) {
-				new Chart(ctx, {
-					type : "line",
-					data : {
-						labels : obj.labels,
-						datasets : [ {
-							label : '가격변동 그래프',
-							data : obj.data,
-							tension : 0.1
-
-						} ]
-					},
-					options : {
-						maintainAspectRatio : false,
-						plugins : {
-							legend : {
-								display : false
-							}
-						},
-						scales : {
-							x : {
-								display : false
-							}
-						}
-					}
-				});
-			});
+			setInterval(drawChart, 10000);
+			setInterval(updateLatestDataSet, 10000);
 		});
 	</script>
 </body>
